@@ -1,5 +1,5 @@
 // @ts-check
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import PropTypes from 'prop-types';
 // @ts-ignore
 import { ImageDropzone, FileUploadButton } from 'react-file-utils';
@@ -13,6 +13,11 @@ import SendButtonComponent from './SendButton';
 
 /** @type {React.FC<import("types").MessageInputProps>} */
 const MessageInputSmall = (props) => {
+  useEffect(() => {
+    const event = new Event('MessageInputSmall-mounted');
+    document.dispatchEvent(event);
+  }, []);
+
   const messageInput = useMessageInput(props);
   const channelContext = useContext(ChannelContext);
   const { t } = useContext(TranslationContext);
@@ -29,6 +34,20 @@ const MessageInputSmall = (props) => {
         maxNumberOfFiles={messageInput.maxFilesLeft}
         handleFiles={messageInput.uploadNewFiles}
       >
+        <div id="record-button">
+          <svg
+            viewBox="0 0 16.933333 21.166666250000002"
+            version="1.1"
+            x="0px"
+            y="0px"
+          >
+            <g transform="translate(0,-280.06669)">
+              <path d="m 8.4667969,280.5957 c -2.3361139,0 -4.234375,1.89826 -4.234375,4.23438 v 3.17383 c 0,2.33611 1.8982628,4.23437 4.234375,4.23437 2.3361121,0 4.2324221,-1.89826 4.2324221,-4.23437 v -3.17383 c 0,-2.33612 -1.896308,-4.23438 -4.2324221,-4.23438 z" />
+              <path d="m 2.6367188,287.4668 c -0.2923548,0.004 -0.5258745,0.24476 -0.5214844,0.53711 -10e-8,3.48009 2.8714729,6.35156 6.3515625,6.35156 3.4802381,0 6.3496091,-2.8729 6.3496091,-6.35156 0,-0.70573 -1.058594,-0.70573 -1.058594,0 0,2.89614 -2.393779,5.29297 -5.2910151,5.29297 -2.8973841,0 -5.2929689,-2.39559 -5.2929688,-5.29297 0.00448,-0.29848 -0.2386342,-0.54159 -0.5371093,-0.53711 z" />
+              <path d="m 6.3496094,295.41211 c -0.7057265,0 -0.7057265,1.05859 0,1.05859 h 4.2343746 c 0.705726,0 0.705726,-1.05859 0,-1.05859 z" />
+            </g>
+          </svg>
+        </div>
         <div
           className={`str-chat__small-message-input ${
             SendButton

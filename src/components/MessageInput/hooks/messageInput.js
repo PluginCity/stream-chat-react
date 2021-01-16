@@ -325,13 +325,19 @@ export default function useMessageInput(props) {
     [emojiPickerRef],
   );
 
-  const openEmojiPicker = useCallback(() => {
-    dispatch({
-      type: 'setEmojiPickerIsOpen',
-      value: true,
-    });
-    document.addEventListener('click', closeEmojiPicker, false);
-  }, [closeEmojiPicker]);
+  const openEmojiPicker = useCallback(
+    (e) => {
+      dispatch({
+        type: 'setEmojiPickerIsOpen',
+        value: true,
+      });
+      document.addEventListener('click', closeEmojiPicker, false);
+      // custom - fix emojis not appearing by passing the event and stopping propogation
+      e.stopPropagation();
+      // end custom
+    },
+    [closeEmojiPicker],
+  );
 
   const onSelectEmoji = useCallback((emoji) => insertText(emoji.native), [
     insertText,

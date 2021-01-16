@@ -1,5 +1,3 @@
-// @ts-check
-
 import React from 'react';
 import DefaultMedia from 'react-player';
 import PropTypes from 'prop-types';
@@ -56,6 +54,16 @@ export const isMediaAttachment = (a) => {
  * @param {ExtendedAttachment} a
  */
 export const isAudioAttachment = (a) => {
+  // const { asset_url } = a;
+  // if (asset_url) {
+  //   const fileExtension = asset_url.split('.').pop();
+  //   const [cleanfileExtension] = fileExtension.split('&');
+
+  //   if (cleanfileExtension.includes('mp3')) {
+  //     return true;
+  //   }
+  // }
+
   return a.type === 'audio';
 };
 
@@ -313,12 +321,12 @@ const Attachment = ({
             return renderImage({ ...propsWithDefault, attachment });
           }
 
-          if (isFileAttachment(attachment)) {
-            return renderFile({ ...propsWithDefault, attachment });
-          }
-
           if (isAudioAttachment(attachment)) {
             return renderAudio({ ...propsWithDefault, attachment });
+          }
+
+          if (isFileAttachment(attachment)) {
+            return renderFile({ ...propsWithDefault, attachment });
           }
 
           if (isMediaAttachment(attachment)) {

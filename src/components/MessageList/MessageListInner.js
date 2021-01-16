@@ -264,7 +264,7 @@ const MessageListInner = (props) => {
 
         return (
           <li
-            className={`str-chat__li str-chat__li--${groupStyles}`}
+            className={`str-chat__li str-chat__li--${groupStyles} ${message.user.id}`}
             key={message.id || message.created_at}
             onLoadCapture={onMessageLoadCaptured}
           >

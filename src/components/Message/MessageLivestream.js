@@ -33,10 +33,11 @@ import {
   useReactionClick,
   useMentionsUIHandler,
   useEditHandler,
+  useDeleteHandler,
 } from './hooks';
 import { areMessagePropsEqual } from './utils';
 import { MessageActions } from '../MessageActions';
-import { ReactionIcon, ThreadIcon, ErrorIcon } from './icons';
+import { ReactionIcon, ThreadIcon, ErrorIcon, TrashIcon } from './icons';
 import MessageTimestamp from './MessageTimestamp';
 
 /**
@@ -95,6 +96,7 @@ const MessageLivestreamComponent = (props) => {
   const handleAction = useActionHandler(message);
   const handleReaction = useReactionHandler(message);
   const handleOpenThread = useOpenThreadHandler(message);
+  const handleDelete = useDeleteHandler(message);
   const {
     editing: ownEditing,
     setEdit: ownSetEditing,
@@ -123,6 +125,32 @@ const MessageLivestreamComponent = (props) => {
 
   const firstGroupStyle = groupStyles ? groupStyles[0] : '';
 
+  const pcMessageDate = message?.created_at?.getDate();
+  const pcMessageMonth = message?.created_at?.getMonth();
+  const pcMessageHours = message?.created_at?.getHours();
+  const pcMessageMins = message?.created_at?.getMinutes();
+  const pcMessageHourshours12Time = pcMessageHours % 12 || 12;
+  const pcAmOrPm = pcMessageHours > 12 ? 'pm' : 'am';
+  const pcMonthsOfYear = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+  const pcMessageTime = `${pcMessageDate} ${pcMonthsOfYear[
+    pcMessageMonth
+  ].substring(0, 3)} ${pcMessageHourshours12Time}:${
+    pcMessageMins < 10 ? `0${pcMessageMins}` : pcMessageMins
+  } ${pcAmOrPm}`;
+
   if (
     !message ||
     message.type === 'message.read' ||
@@ -130,7 +158,6 @@ const MessageLivestreamComponent = (props) => {
   ) {
     return null;
   }
-
   if (message.deleted_at) {
     return smartRender(MessageDeleted, props, null);
   }
@@ -210,6 +237,18 @@ const MessageLivestreamComponent = (props) => {
           <div className="str-chat__message-livestream-content">
             <div className="str-chat__message-livestream-author">
               <strong>{message.user?.name || message.user?.id}</strong>
+              <span id="msg-details-admin" className="admin-only">
+                {' '}
+                {/* {message.user?.type === 'admin' && (`${message.user?.id} | ${message.user?.email}`)} */}
+                <a href={`/wp-admin/user-edit.php?user_id=${message.user?.wp_user_id}`}>User ID {message.user?.wp_user_id} </a>
+                | {message.user?.email}
+              </span>
+              {/* <MessageTimestamp
+                customClass="str-chat__message-livestream-time"
+                message={message}
+                formatDate={formatDate}
+                tDateTimeParser={propTDateTimeParser}
+              /> */}
               {message?.type === 'error' && (
                 <div className="str-chat__message-team-error-header">
                   {t('Only visible to you')}
@@ -270,7 +309,6 @@ const MessageLivestreamComponent = (props) => {
                 </p>
               )}
             </div>
-
             {message?.attachments && Attachment && (
               <Attachment
                 attachments={message.attachments}
@@ -293,6 +331,16 @@ const MessageLivestreamComponent = (props) => {
                 reply_count={message.reply_count}
               />
             )}
+            <div className="pc-message-footer">
+              <span className="pc-message-time">{pcMessageTime}</span>
+              <span
+                data-testid="message-livestream-trash-action"
+                id="pcmc-trash-msg-button"
+                onClick={handleDelete}
+              >
+                <TrashIcon />
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -304,6 +352,11 @@ const MessageLivestreamComponent = (props) => {
  * @type { React.FC<import('types').MessageLivestreamActionProps> }
  */
 const MessageLivestreamActions = (props) => {
+  useEffect(() => {
+    const event = new Event('MessageLivestreamActions-mounted');
+    document.dispatchEvent(event);
+  }, []);
+
   const {
     initialMessage,
     message,
@@ -316,6 +369,7 @@ const MessageLivestreamActions = (props) => {
     handleOpenThread,
     tDateTimeParser: propTDateTimeParser,
   } = props;
+  const handleDelete = useDeleteHandler(message);
   const [actionsBoxOpen, setActionsBoxOpen] = useState(false);
   /** @type {() => void} Typescript syntax */
   const hideOptions = useCallback(() => setActionsBoxOpen(false), []);
@@ -390,6 +444,13 @@ const MessageLivestreamActions = (props) => {
           <ThreadIcon />
         </span>
       )}
+      <span
+        data-testid="message-livestream-trash-action"
+        id="pcmc-trash-msg-button"
+        onClick={handleDelete}
+      >
+        <TrashIcon />
+      </span>
       <MessageActions
         {...props}
         getMessageActions={getMessageActions}
